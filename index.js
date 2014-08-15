@@ -59,7 +59,7 @@ function gnipToArcGIS(gnipRecord) {
     'twitter_filter_level': gnipRecord.twitter_filter_level,
     'twitter_language': gnipRecord.twitter_lang,
     'gnip_klout_score': gnipRecord.gnip.klout_score,
-    'gnip_language': gnipRecord.gnip.language.value,//gnipRecord.gnip.language,
+    'gnip_language': gnipRecord.gnip.language.value,
     'gnip_profileLoc_type': gnipProfileLocation.objectType,
     'gnip_profileLoc_displayName': gnipProfileLocation.displayName,
     'gnip_profileLoc_adr_country': gnipProfileLocation.address.country,
@@ -156,7 +156,7 @@ function EsriGnip(options, initializationCallback) {
         });
       }
     });
-  }
+  };
 }
 
 module.exports = exports = EsriGnip;

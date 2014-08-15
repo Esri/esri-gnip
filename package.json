@@ -1,6 +1,6 @@
 {
   "name": "esri-gnip",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A service to transfer GNIP query records to Esri FeatureServices",
   "main": "index.js",
   "repository": "https://github.com/ArcGIS/esri-gnip.git",
