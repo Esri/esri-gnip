@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "A service to transfer GNIP query records to Esri FeatureServices",
   "main": "index.js",
-  "repository": "https://github.com/nixta/esri-gnip.git",
+  "repository": "https://github.com/ArcGIS/esri-gnip.git",
   "dependencies": {
     "terraformer": "~1.0.4",
     "terraformer-arcgis-parser": "~1.0.4",
