@@ -9,6 +9,7 @@ var locatedKey = 'withLocation',
 
 function sanitizeGnipRecord(gnipRecord) {
   gnipRecord.actor.location = gnipRecord.actor.location || { objectType: '', displayName: '' };
+  gnipRecord.gnip.language = gnipRecord.gnip.language || { value: '' };
 }
 
 function gnipToArcGIS(gnipRecord) {
@@ -16,58 +17,71 @@ function gnipToArcGIS(gnipRecord) {
 
   // Translate it to ArcGIS Table Structure
   var gnipProfileLocation = gnipRecord.gnip.profileLocations[0],
-      attributes = {
-    'body': gnipRecord.body,
-    'verb': gnipRecord.verb,
-    'postedTime': new Date(gnipRecord.postedTime),
-    'link': gnipRecord.link,
-    'retweetCount': gnipRecord.retweetCount,
-    'favoritesCount': gnipRecord.favoritesCount,
-    'actor_id': gnipRecord.actor.id,
-    'actor_type': gnipRecord.actor.objectType,
-    'actor_link': gnipRecord.actor.link,
-    'actor_displayName': gnipRecord.actor.displayName,
-    'actor_image': gnipRecord.actor.image,
-    'actor_summary': gnipRecord.actor.summary,
-    'actor_postedTime': new Date(gnipRecord.actor.postedTime),
-    'actor_friendsCount': gnipRecord.actor.friendsCount,
-    'actor_followsCount': gnipRecord.actor.followersCount,
-    'actor_listedCount': gnipRecord.actor.listedCount,
-    'actor_statusesCount': gnipRecord.actor.statusesCount,
-    'actor_favoritesCount': gnipRecord.actor.favoritesCount,
-    'actor_timezone': gnipRecord.actor.twitterTimeZone,
-    'actor_utcOffset': parseInt(gnipRecord.actor.utcOffset), // Maybe be safer?
-    'actor_verified': gnipRecord.actor.verified,
-    'actor_preferredUsername': gnipRecord.actor.preferredUsername,
-    'actor_languages': gnipRecord.actor.languages[0],
-    'actor_location_type': gnipRecord.actor.location.objectType,
-    'actor_location_displayName': gnipRecord.actor.location.displayName,
-    'generator_displayName': gnipRecord.generator.displayName,
-    'generator_link': gnipRecord.generator.link,
-    'provider_type': gnipRecord.provider.objectType,
-    'provider_displayName': gnipRecord.provider.displayName,
-    'provider_link': gnipRecord.provider.link,
-    'object_type': gnipRecord.object.objectType,
-    'object_id': gnipRecord.object.id,
-    'object_summary': gnipRecord.object.summary,
-    'object_link': gnipRecord.object.link,
-    'object_postedTime': new Date(gnipRecord.object.postedTime),
-    'twitter_hashtags': '',
-    'twitter_symbols': '',
-    'twitter_urls': '',
-    'twitter_userMentions': '',
-    'twitter_filter_level': gnipRecord.twitter_filter_level,
-    'twitter_language': gnipRecord.twitter_lang,
-    'gnip_klout_score': gnipRecord.gnip.klout_score,
-    'gnip_language': gnipRecord.gnip.language.value,
-    'gnip_profileLoc_type': gnipProfileLocation.objectType,
-    'gnip_profileLoc_displayName': gnipProfileLocation.displayName,
-    'gnip_profileLoc_adr_country': gnipProfileLocation.address.country,
-    'gnip_profileLoc_adr_countryCode': gnipProfileLocation.address.countryCode,
-    'gnip_profileLoc_adr_locality': gnipProfileLocation.address.locality,
-    'gnip_profileLoc_adr_region': gnipProfileLocation.address.region,
-    'gnip_profileLoc_adr_subRegion': gnipProfileLocation.address.subRegion
-  };
+      attributes;
+  try {
+    attributes = {
+      'body': gnipRecord.body,
+      'verb': gnipRecord.verb,
+      'postedTime': new Date(gnipRecord.postedTime),
+      'link': gnipRecord.link,
+      'retweetCount': gnipRecord.retweetCount,
+      'favoritesCount': gnipRecord.favoritesCount,
+      'actor_id': gnipRecord.actor.id,
+      'actor_type': gnipRecord.actor.objectType,
+      'actor_link': gnipRecord.actor.link,
+      'actor_displayName': gnipRecord.actor.displayName,
+      'actor_image': gnipRecord.actor.image,
+      'actor_summary': gnipRecord.actor.summary,
+      'actor_postedTime': new Date(gnipRecord.actor.postedTime),
+      'actor_friendsCount': gnipRecord.actor.friendsCount,
+      'actor_followsCount': gnipRecord.actor.followersCount,
+      'actor_listedCount': gnipRecord.actor.listedCount,
+      'actor_statusesCount': gnipRecord.actor.statusesCount,
+      'actor_favoritesCount': gnipRecord.actor.favoritesCount,
+      'actor_timezone': gnipRecord.actor.twitterTimeZone,
+      'actor_utcOffset': parseInt(gnipRecord.actor.utcOffset), // Maybe be safer?
+      'actor_verified': gnipRecord.actor.verified,
+      'actor_preferredUsername': gnipRecord.actor.preferredUsername,
+      'actor_languages': gnipRecord.actor.languages[0],
+      'actor_location_type': gnipRecord.actor.location.objectType,
+      'actor_location_displayName': gnipRecord.actor.location.displayName,
+      'generator_displayName': gnipRecord.generator.displayName,
+      'generator_link': gnipRecord.generator.link,
+      'provider_type': gnipRecord.provider.objectType,
+      'provider_displayName': gnipRecord.provider.displayName,
+      'provider_link': gnipRecord.provider.link,
+      'object_type': gnipRecord.object.objectType,
+      'object_id': gnipRecord.object.id,
+      'object_summary': gnipRecord.object.summary,
+      'object_link': gnipRecord.object.link,
+      'object_postedTime': new Date(gnipRecord.object.postedTime),
+      'twitter_hashtags': '',
+      'twitter_symbols': '',
+      'twitter_urls': '',
+      'twitter_userMentions': '',
+      'twitter_filter_level': gnipRecord.twitter_filter_level,
+      'twitter_language': gnipRecord.twitter_lang,
+      'gnip_klout_score': gnipRecord.gnip.klout_score,
+      'gnip_language': gnipRecord.gnip.language.value,
+      'gnip_profileLoc_type': gnipProfileLocation.objectType,
+      'gnip_profileLoc_displayName': gnipProfileLocation.displayName,
+      'gnip_profileLoc_adr_country': gnipProfileLocation.address.country,
+      'gnip_profileLoc_adr_countryCode': gnipProfileLocation.address.countryCode,
+      'gnip_profileLoc_adr_locality': gnipProfileLocation.address.locality,
+      'gnip_profileLoc_adr_region': gnipProfileLocation.address.region,
+      'gnip_profileLoc_adr_subRegion': gnipProfileLocation.address.subRegion
+    };
+  } catch (ex) {
+    console.log(ex);
+    console.log(gnipRecord);
+    return {
+      translationError: {
+        message: ex.message,
+        stack: ex.stack
+      },
+      record: gnipRecord
+    };
+  }
 
   var recordLocation = new Terraformer.Point(gnipProfileLocation.geo.coordinates);
 
@@ -142,17 +156,19 @@ function EsriGnip(options, initializationCallback) {
     var arcGISRecords = _.map(processedRecords[locatedKey], function(gnipItem) { 
       return gnipToArcGIS(gnipItem);
     });
+    var translationErrors = _.remove(arcGISRecords, function(item) {
+      return item.hasOwnProperty('translationError');
+    });
 
     featureService.add({features: arcGISRecords}, function(err, data) {
       if (err) {
         callback(err);
       } else {
-        var successes = _.filter(data.addResults, {success: true}),
-            failures  = _.filter(data.addResults, {success: false});
         callback(null, {
-          successes: successes, 
-          failures: failures, 
-          skipped: processedRecords[unlocatedKey]
+          successes: _.filter(data.addResults, {success: true}),
+          failures:  _.filter(data.addResults, {success: false}),
+          unlocated: processedRecords[unlocatedKey],
+          translationErrors: translationErrors
         });
       }
     });
