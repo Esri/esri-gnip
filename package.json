@@ -1,13 +1,13 @@
 {
   "name": "esri-gnip",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "A service to transfer GNIP query records to Esri FeatureServices",
   "main": "index.js",
   "repository": "https://github.com/ArcGIS/esri-gnip.git",
   "dependencies": {
     "terraformer": "~1.0.4",
     "terraformer-arcgis-parser": "~1.0.4",
-    "geoservices": "~0.2.0",
+    "geoservices": "~1.0.0",
     "lodash": "~2.4.1"
   },
   "author": {
