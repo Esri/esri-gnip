@@ -1,26 +1,60 @@
 esri-gnip
 =========
 
-A simple node package to write gnip records to an [ArcGIS Feature Service](http://resources.arcgis.com/en/help/arcgis-rest-api/#/Feature_Service/02r3000000z2000000/).
+A simple node package to parse Gnip records into ArcGIS JSON, and to write Gnip records to an [ArcGIS Feature Service](http://resources.arcgis.com/en/help/arcgis-rest-api/#/Feature_Service/02r3000000z2000000/).
 
 Gnip records without location information will be stripped out and ignored.
 
 ## Requirements
 * [node.js](http://nodejs.org)
-* An ArcGIS Online account ([Developer](https://developers.arcgis.com/en/) or [Organization](http://www.arcgis.com/home/) will work).
-* A published, editable Feature Service matching the [`Gnip.sd`](Gnip.sd) Service Definition. See [here](http://doc.arcgis.com/en/arcgis-online/share-maps/add-items.htm#ESRI_SECTION1_FFA71B14C6EE459B8E1BEBC8100010DF) for more details.
+* To write records:
+    * An ArcGIS Online account ([Developer](https://developers.arcgis.com/en/) or [Organization](http://www.arcgis.com/home/) will work).
+    * A published, editable Feature Service matching the [`Gnip.sd`](Gnip.sd) Service Definition. See [here](http://doc.arcgis.com/en/arcgis-online/share-maps/add-items.htm#ESRI_SECTION1_FFA71B14C6EE459B8E1BEBC8100010DF) for more details.
 
 ##Usage
-You must publish a FeatureService on ArcGIS Online.
+###Parsing
+To parse an array of Gnip records:
+
+``` JavaScript
+var esriGnip = require('esri-gnip');
+var output = esriGnip.parse(gnipTestData);
+```
+
+Where `output` will be an object of structue:
+
+``` JSON
+{
+  arcgisRecords: [],    // arcGISRecords
+  unlocated: [],        // gnipRecords
+  translationErrors: [] // translationErrors
+}
+```
+
+and a `translationError` looks like:
+
+``` JSON
+{
+  translationError: { 
+    message: '<string>', 
+    stack: '<string>'
+  },
+  record: '<gnipRecord>'
+}
+```
+
+You can optionally reject Gnip records that have a location of `[0,0]` by passing `true` as the second parameter to `.parse()`.
+
+###Writing
+You must first publish a suitable FeatureService on ArcGIS Online (see [requirements](#Requirements)).
 
 Once you have a service endpoint:
 
 ``` JavaScript
-var EsriGnip = require('esri-gnip');
+var esriGnip = require('esri-gnip');
 
 var featureServiceURL = 'http://services.arcgis.com/...../arcgis/rest/services/Gnip/FeatureServer/0';
 
-var myGnip = EsriGnip(featureServiceURL, function(err, metadata) {
+var myGnip = new esriGnip.Writer(featureServiceURL, function(err, metadata) {
   if (err) {
     console.error(err);
   } else {
@@ -34,6 +68,8 @@ var myGnip = EsriGnip(featureServiceURL, function(err, metadata) {
   }
 });
 ```
+
+Note, you should avoid sending too many records in a single call to `.postGnipRecordsToFeatureService()`.
 
 ##Known Limitations
 * Authentication and tokenization is not implemented. Target FeatureServices must be public.

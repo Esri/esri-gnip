@@ -7,16 +7,102 @@ Terraformer.ArcGIS = require('terraformer-arcgis-parser');
 var locatedKey = 'withLocation',
     unlocatedKey = 'withoutLocation';
 
+var locTypeGeo = 'location',
+    locTypeLocationBBox = 'bbox',
+    locTypeGnipProfile = 'profile';
+
+function locationCoordinates(gnipRecord) {
+  // Could be .geo, .location.geo, or .gnip.profileLocations[0].geo
+  // Note, that, confusingly, .geo is in lat/lon, whereas the others are in lon/lat 
+  var coordinates = null;
+
+  if (gnipRecord.hasOwnProperty('geo')) {
+    gnipRecord.__parsedLocationType = locTypeGeo;
+    coordinates = [gnipRecord.geo.coordinates[1], gnipRecord.geo.coordinates[0]];
+  } else if (gnipRecord.hasOwnProperty('location') &&
+             gnipRecord.location.hasOwnProperty('geo')) { // TODO - Make more specific
+    var bbox = gnipRecord.location.geo.coordinates[0], // [bl, tl, tr, br]
+        xmin = bbox[0][0], ymin = bbox[0][1],
+        xmax = bbox[2][0], ymax = bbox[2][1];
+    gnipRecord.__parsedLocationType = locTypeLocationBBox;
+    coordinates = [(xmin + xmax) / 2, (ymin + ymax) / 2];
+  } else if (gnipRecord.gnip.hasOwnProperty('profileLocations') &&
+             {}.toString.call(gnipRecord.gnip.profileLocations) === '[object Array]' &&
+             gnipRecord.gnip.profileLocations.length > 0 &&
+             gnipRecord.gnip.profileLocations[0].hasOwnProperty('geo')) {
+    gnipRecord.__parsedLocationType = locTypeGnipProfile;
+    coordinates = gnipRecord.gnip.profileLocations[0].geo.coordinates;
+  }
+
+  return coordinates;
+}
+
+function gnipRecordHasLocationInformation(gnipRecord, excludeNullIsland) {
+  var coordinates = locationCoordinates(gnipRecord),
+      coordinateOK = coordinates !== null;
+  if (coordinateOK && excludeNullIsland && coordinates[0] === 0 && coordinates[1] === 0) {
+    coordinateOK = false;
+    console.log('Possible erroneous coordinates ' + JSON.stringify(coordinates) + ' on record ' + gnipRecord.id + ' (' + gnipRecord.link + ')');
+  }
+  return coordinateOK;
+}
+
+function preprocessGnipRecords(gnipRecords, excludeNullIslands) {
+  return _.groupBy(gnipRecords, function(gnipRecord) { 
+    return gnipRecordHasLocationInformation(gnipRecord, excludeNullIslands)?locatedKey:unlocatedKey;
+  });
+}
+
+
+
 function sanitizeGnipRecord(gnipRecord) {
+  // Make sure that commonly missing fields have a sensible fallback for the rest of the parser
   gnipRecord.actor.location = gnipRecord.actor.location || { objectType: '', displayName: '' };
   gnipRecord.gnip.language = gnipRecord.gnip.language || { value: '' };
+}
+
+function appendLocationInfo(attributes, gnipRecord) {
+  var coordinates = locationCoordinates(gnipRecord);
+
+  if (gnipRecord.hasOwnProperty('__parsedLocationType')) {
+    var locationAttributes = {
+      'loc_type': gnipRecord.__parsedLocationType
+    };
+
+    if (gnipRecord.__parsedLocationType === locTypeLocationBBox) {
+      locationAttributes = {
+        'loc_type': locTypeLocationBBox,
+        'loc_displayName': gnipRecord.location.displayName,
+        'loc_name': gnipRecord.location.name,
+        'loc_country': gnipRecord.location.country_code,
+        'loc_countryCode': gnipRecord.location.twitter_country_code
+      };
+    } else if (gnipRecord.__parsedLocationType === locTypeGnipProfile) {
+      var gnipProfileLocation = gnipRecord.gnip.profileLocations[0];
+      locationAttributes = {
+        'loc_type': locTypeGnipProfile,
+        'loc_displayName': gnipProfileLocation.displayName,
+        'loc_name': gnipProfileLocation.displayName,
+        'loc_country': gnipProfileLocation.address.country,
+        'loc_countryCode': gnipProfileLocation.address.countryCode,
+        'gnip_profileLoc_adr_locality': gnipProfileLocation.address.locality,
+        'gnip_profileLoc_adr_region': gnipProfileLocation.address.region,
+        'gnip_profileLoc_adr_subRegion': gnipProfileLocation.address.subRegion
+      };
+
+      _.merge(attributes, locationAttributes);
+    }
+  }
+
+  return coordinates;
 }
 
 function gnipToArcGIS(gnipRecord) {
   sanitizeGnipRecord(gnipRecord);
 
   // Translate it to ArcGIS Table Structure
-  var gnipProfileLocation = gnipRecord.gnip.profileLocations[0],
+  var coordinates = null,
+      mercatorGeom = null,
       attributes;
   try {
     attributes = {
@@ -62,15 +148,10 @@ function gnipToArcGIS(gnipRecord) {
       'twitter_filter_level': gnipRecord.twitter_filter_level,
       'twitter_language': gnipRecord.twitter_lang,
       'gnip_klout_score': gnipRecord.gnip.klout_score,
-      'gnip_language': gnipRecord.gnip.language.value,
-      'gnip_profileLoc_type': gnipProfileLocation.objectType,
-      'gnip_profileLoc_displayName': gnipProfileLocation.displayName,
-      'gnip_profileLoc_adr_country': gnipProfileLocation.address.country,
-      'gnip_profileLoc_adr_countryCode': gnipProfileLocation.address.countryCode,
-      'gnip_profileLoc_adr_locality': gnipProfileLocation.address.locality,
-      'gnip_profileLoc_adr_region': gnipProfileLocation.address.region,
-      'gnip_profileLoc_adr_subRegion': gnipProfileLocation.address.subRegion
+      'gnip_language': gnipRecord.gnip.language.value
     };
+
+    coordinates = appendLocationInfo(attributes, gnipRecord);
   } catch (ex) {
     console.log(ex);
     console.log(gnipRecord);
@@ -83,32 +164,40 @@ function gnipToArcGIS(gnipRecord) {
     };
   }
 
-  var recordLocation = new Terraformer.Point(gnipProfileLocation.geo.coordinates);
+  if (coordinates !== null) {
+    var recordLocation = new Terraformer.Point(coordinates);
+    mercatorGeom = Terraformer.ArcGIS.convert(recordLocation.toMercator());
+  }
 
   var arcgisRecord = {
-    geometry: Terraformer.ArcGIS.convert(recordLocation.toMercator()),
+    geometry: mercatorGeom,
     attributes: attributes
   };
 
   return arcgisRecord;
 }
 
-function gnipRecordHasLocationInformation(record) {
-  return _.has(record.gnip, 'profileLocations') &&
-         _.isArray(record.gnip.profileLocations) && 
-         record.gnip.profileLocations.length > 0;
-}
+function parseGnipToArcGIS(gnipRecords, excludeNullIslands) {
+  excludeNullIslands = excludeNullIslands === true;
 
-function preprocessGnipRecords(records) {
-  return _.groupBy(records, function(record) { 
-    return gnipRecordHasLocationInformation(record)?locatedKey:unlocatedKey;
+  var processedRecords = preprocessGnipRecords(gnipRecords, excludeNullIslands);
+  var arcGISRecords = _.map(processedRecords[locatedKey], function(gnipItem) { 
+    return gnipToArcGIS(gnipItem);
   });
+  var translationErrors = _.remove(arcGISRecords, function(item) {
+    return item.hasOwnProperty('translationError');
+  });
+
+  return {
+    arcgisRecords: arcGISRecords,
+    unlocated: processedRecords[unlocatedKey],
+    translationErrors: translationErrors
+  };
 }
 
 
 
 function EsriGnip(options, initializationCallback) {
-
   // Object properties
   this.options = {};
   this.featureServiceLoaded = false;
@@ -142,7 +231,7 @@ function EsriGnip(options, initializationCallback) {
       this.featureServiceLoaded = true;
     }
     if (initializationCallback) {
-      initializationCallback(err, metadata);
+      initializationCallback.bind(this)(err, metadata);
     }
   }.bind(this));
 
@@ -152,27 +241,22 @@ function EsriGnip(options, initializationCallback) {
 
   // Call this with an array of Gnip records to write them to the FeatureLayer.
   this.postGnipRecordsToFeatureService = function(gnipRecords, callback) {
-    var processedRecords = preprocessGnipRecords(gnipRecords);
-    var arcGISRecords = _.map(processedRecords[locatedKey], function(gnipItem) { 
-      return gnipToArcGIS(gnipItem);
-    });
-    var translationErrors = _.remove(arcGISRecords, function(item) {
-      return item.hasOwnProperty('translationError');
-    });
+    var output = parseGnipToArcGIS(gnipRecords),
+        arcGISRecords = output.arcgisRecords;
+    delete output.arcgisRecords;
 
     featureService.add({features: arcGISRecords}, function(err, data) {
       if (err) {
-        callback(err);
+        callback(err, output);
       } else {
-        callback(null, {
-          successes: _.filter(data.addResults, {success: true}),
-          failures:  _.filter(data.addResults, {success: false}),
-          unlocated: processedRecords[unlocatedKey],
-          translationErrors: translationErrors
-        });
+        output.successes = _.filter(data.addResults, {success: true});
+        output.failures = _.filter(data.addResults, {success: false});
+        callback(null, output);
       }
     });
   };
 }
 
-module.exports = exports = EsriGnip;
+exports.Writer = EsriGnip;
+exports.parse = parseGnipToArcGIS;
+
