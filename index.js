@@ -42,7 +42,7 @@ function gnipRecordHasLocationInformation(gnipRecord, excludeNullIsland) {
       coordinateOK = coordinates !== null;
   if (coordinateOK && excludeNullIsland && coordinates[0] === 0 && coordinates[1] === 0) {
     coordinateOK = false;
-    console.log('Possible erroneous coordinates ' + JSON.stringify(coordinates) + ' on record ' + gnipRecord.id + ' (' + gnipRecord.link + ')');
+    console.warn('Possible erroneous coordinates ' + JSON.stringify(coordinates) + ' on record ' + gnipRecord.id + ' (' + gnipRecord.link + ')');
   }
   return coordinateOK;
 }
@@ -106,6 +106,7 @@ function gnipToArcGIS(gnipRecord) {
       attributes;
   try {
     attributes = {
+      'activity_id': gnipRecord.id,
       'body': gnipRecord.body,
       'verb': gnipRecord.verb,
       'postedTime': new Date(gnipRecord.postedTime),
