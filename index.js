@@ -219,10 +219,15 @@ function EsriGnip(options, initializationCallback) {
   }
 
 
+
   // Create a new FeatureService connection to the target layer and callback when done.
-  var featureService = new client.featureservice({
+  var fsOptions = {
     url: this.options.url
-  }, function(err, metadata) {
+  };
+  if (options.hasOwnProperty('token')) {
+    fsOptions.token = options.token;
+  }
+  var featureService = new client.featureservice(fsOptions, function(err, metadata) {
     if (err) {
       if ({}.toString.call(err) === '[object String]') {
         err = {message: err};
