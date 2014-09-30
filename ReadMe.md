@@ -5,7 +5,7 @@ A simple node package to parse and write Gnip JSON records into an [ArcGIS Featu
 
 ## Requirements
 1. Gnip data - A set of Gnip records in [Gnip JSON format](http://support.gnip.com/sources/twitter/data_format.html), retrieved from the [Gnip APIs](http://support.gnip.com/apis/). See also [gnip-reader](https://www.npmjs.org/package/gnip-reader). Contact these [guys](http://gnip.com/) if you need to get data.
-2. A pre-configured ArcGIS Online [Feature Service](https://developers.arcgis.com/en/) to store the data. See details below to configure your [target Feature Service](#creating-a-target-feature-service).
+2. A pre-configured [ArcGIS Online Feature Service](https://developers.arcgis.com/en/features/cloud-storage/) to store the data. See details below to configure your [target Feature Service](#creating-a-target-feature-service).
 3. [node.js](http://nodejs.org)
 
 ## Usage
