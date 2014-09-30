@@ -22,23 +22,23 @@ var output = esriGnip.parse(gnipTestData);
 
 Where `output` will be an object of structue:
 
-``` JSON
+``` JavaScript
 {
-  'arcgisRecords': [],    // arcGISRecords
-  'unlocated': [],        // gnipRecords
-  'translationErrors': [] // translationErrors
+  arcgisRecords: [],    // arcGISRecords
+  unlocated: [],        // gnipRecords
+  translationErrors: [] // translationErrors
 }
 ```
 
 and a `translationError` looks like:
 
-``` JSON
+``` JavaScript
 {
-  'translationError': { 
-    'message': '<string>', 
-    'stack': '<string>'
+  translationError: { 
+    message: '<string>', 
+    stack: '<string>'
   },
-  'record': '<gnipRecord>'
+  record: '<gnipRecord>'
 }
 ```
 
