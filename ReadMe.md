@@ -5,7 +5,7 @@ A simple node package to parse and write Gnip JSON records into an [ArcGIS Featu
 
 ## Requirements
 1. Gnip data - A set of Gnip records in [Gnip JSON format](http://support.gnip.com/sources/twitter/data_format.html), retrieved from the [Gnip APIs](http://support.gnip.com/apis/). See also [gnip-reader](https://www.npmjs.org/package/gnip-reader). Contact these [guys](http://gnip.com/) if you need to get data.
-2. A pre-configured ArcGIS Online Feature Service to store the data. ArcGIS Online subscription ([Developer](https://developers.arcgis.com/en/) or [Organization](http://www.arcgis.com/home/) will work) or your own ArcGIS Server instance.  See details below to configure your [target Feature Service](#creating-a-target-feature-service).
+2. A pre-configured ArcGIS Online [Feature Service](https://developers.arcgis.com/en/) to store the data. See details below to configure your [target Feature Service](#creating-a-target-feature-service).
 3. [node.js](http://nodejs.org)
 
 ## Usage
@@ -143,6 +143,9 @@ A target feature service of the correct schema is required to write Gnip records
 12. Click `Done`
 
 You will be taken to the new Feature Service's *item page*. To get the REST Endpoint URL, click the layer name in the `Layers` section (or click the caret next to it to display the popup menu and select `Service URL`). The URL of the newly opened page is the REST Endpoint needed by esri-gnip and will look similar to the URL in Step 5 above.
+
+NOTE: Go here to get a free [ArcGIS Developer subscription](https://developers.arcgis.com/en/) or a trial [ArcGIS Online Organization subscription](http://www.arcgis.com/home/). 
+
 
 ## Resources
 
