@@ -4,9 +4,9 @@ esri-gnip
 A simple node package to parse and write Gnip JSON records into an [ArcGIS Feature Service](http://resources.arcgis.com/en/help/arcgis-rest-api/#/Feature_Service/02r3000000z2000000/).
 
 ## Requirements
-* [node.js](http://nodejs.org)
-* An ArcGIS Online subscription ([Developer](https://developers.arcgis.com/en/) or [Organization](http://www.arcgis.com/home/) will work) or your own ArcGIS Server instance.
-* A set of Gnip records in [Gnip JSON format](http://support.gnip.com/sources/twitter/data_format.html), retrieved from the [Gnip APIs](http://support.gnip.com/apis/). See also [gnip-reader](https://www.npmjs.org/package/gnip-reader).
+1. Gnip data - A set of Gnip records in [Gnip JSON format](http://support.gnip.com/sources/twitter/data_format.html), retrieved from the [Gnip APIs](http://support.gnip.com/apis/). See also [gnip-reader](https://www.npmjs.org/package/gnip-reader). Contact these [guys](http://gnip.com/) if you need to get data.
+2. A pre-configured ArcGIS Online Feature Service to store the data. ArcGIS Online subscription ([Developer](https://developers.arcgis.com/en/) or [Organization](http://www.arcgis.com/home/) will work) or your own ArcGIS Server instance.  See details below to configure your [target Feature Service](#creating-a-target-feature-service).
+3. [node.js](http://nodejs.org)
 
 ## Usage
 ### Installing
