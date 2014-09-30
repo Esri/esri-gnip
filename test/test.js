@@ -1,8 +1,8 @@
-var esriGnip = require('./index');
+var esriGnip = require('../index');
 
 var featureServiceURL = 'http://services.arcgis.com/OfH668nDRN7tbJh0/arcgis/rest/services/Gnip/FeatureServer/0';
 
-var gnipTestData = require('./test-data/gniptest.json').results;
+var gnipTestData = require('./gniptest.json').results;
 
 var myGnip = new esriGnip.Writer(featureServiceURL, function(err, metadata) {
   if (err) {

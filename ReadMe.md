@@ -24,9 +24,9 @@ Where `output` will be an object of structue:
 
 ``` JSON
 {
-  arcgisRecords: [],    // arcGISRecords
-  unlocated: [],        // gnipRecords
-  translationErrors: [] // translationErrors
+  'arcgisRecords': [],    // arcGISRecords
+  'unlocated': [],        // gnipRecords
+  'translationErrors': [] // translationErrors
 }
 ```
 
@@ -34,11 +34,11 @@ and a `translationError` looks like:
 
 ``` JSON
 {
-  translationError: { 
-    message: '<string>', 
-    stack: '<string>'
+  'translationError': { 
+    'message': '<string>', 
+    'stack': '<string>'
   },
-  record: '<gnipRecord>'
+  'record': '<gnipRecord>'
 }
 ```
 
@@ -69,10 +69,33 @@ var myGnip = new esriGnip.Writer(featureServiceURL, function(err, metadata) {
 });
 ```
 
-Note, you should avoid sending too many records in a single call to `.postGnipRecordsToFeatureService()`.
+Note, you should avoid sending too many records in a single call to `.postGnipRecordsToFeatureService()` to avoid the POST call becoming to large and introducing too much latency.
 
-##Known Limitations
-* Authentication and tokenization is not implemented. Target FeatureServices must be public.
+###Authentication
+You can pass in an options object instead of a URL as the first parameter to `new esriGnip.Writer()`. The options object must contail a `url` property, and can optionally contain a `token` property for authentication with the target Feature Service, in case that feature service is not public:
+
+``` JavaScript
+var esriGnip = require('esri-gnip');
+
+var options = {
+  url: 'http://services.arcgis.com/...../arcgis/rest/services/Gnip/FeatureServer/0',
+  token: '<some-authentication-token>'
+};
+
+var myGnip = new esriGnip.Writer(options, function(err, metadata) {
+  if (err) {
+    console.error(err);
+  } else {
+    this.postGnipRecordsToFeatureService([ /* array of gnip records */ ], function(err, results) {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log(results);
+      }
+    });
+  }
+});
+```
 
 ## Resources
 
@@ -80,7 +103,7 @@ Note, you should avoid sending too many records in a single call to `.postGnipRe
 * [node.js documentation](http://nodejs.org/api/)
 * [Terraformer](https://github.com/esri/terraformer)
 * [Gnip Documentation](http://support.gnip.com/sources/twitter/data_format.html) (incomplete)
-* [Gnip Test Records](test-data/gniptest.json)
+* [Gnip Test Records](test/gniptest.json)
 
 ## Issues
 
