@@ -37,10 +37,10 @@ function locationCoordinates(gnipRecord) {
   return coordinates;
 }
 
-function gnipRecordHasLocationInformation(gnipRecord, excludeNullIsland) {
+function gnipRecordHasLocationInformation(gnipRecord, excludeNullIslands) {
   var coordinates = locationCoordinates(gnipRecord),
       coordinateOK = coordinates !== null;
-  if (coordinateOK && excludeNullIsland && coordinates[0] === 0 && coordinates[1] === 0) {
+  if (coordinateOK && excludeNullIslands && coordinates[0] === 0 && coordinates[1] === 0) {
     coordinateOK = false;
     console.warn('Possible erroneous coordinates ' + JSON.stringify(coordinates) + ' on record ' + gnipRecord.id + ' (' + gnipRecord.link + ')');
   }
@@ -241,13 +241,12 @@ function EsriGnip(options, initializationCallback) {
     }
   }.bind(this));
 
-
   /// Methods
   /// =======
 
   // Call this with an array of Gnip records to write them to the FeatureLayer.
   this.postGnipRecordsToFeatureService = function(gnipRecords, callback) {
-    var output = parseGnipToArcGIS(gnipRecords),
+    var output = parseGnipToArcGIS(gnipRecords, this.options.excludeNullIslands),
         arcGISRecords = output.arcgisRecords;
     delete output.arcgisRecords;
 
