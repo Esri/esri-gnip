@@ -1,7 +1,16 @@
 esri-gnip
 =========
 
-A simple node package to parse and write Gnip JSON records into an [ArcGIS Feature Service](http://resources.arcgis.com/en/help/arcgis-rest-api/#/Feature_Service/02r3000000z2000000/).
+A simple node package to parse and write [Gnip JSON](http://support.gnip.com/sources/twitter/data_format.html) records into an [ArcGIS Feature Service](https://developers.arcgis.com/en/features/cloud-storage/).
+
+## Features
+* Write raw [Gnip JSON](http://support.gnip.com/sources/twitter/data_format.html) to an [ArcGIS Feature Service](https://developers.arcgis.com/en/features/cloud-storage/).
+* Automatically exclude Gnip records with no geolocation.
+* Optionally exclude Gnip records at 0,0.
+* Optionally parse Gnip JSON to ArcGIS JSON without writing.
+* Supports ArcGIS token-based authentication.
+
+See [gnip-reader](https://www.npmjs.org/package/gnip-reader) to obtain Gnip JSON records from the [Gnip Search API](http://support.gnip.com/apis/search_api/api_reference.html#SearchRequests).
 
 ## Requirements
 1. Gnip data - A set of Gnip records in [Gnip JSON format](http://support.gnip.com/sources/twitter/data_format.html), retrieved from the [Gnip APIs](http://support.gnip.com/apis/). See also [gnip-reader](https://www.npmjs.org/package/gnip-reader). Contact these [guys](http://gnip.com/) if you need to get data.
@@ -15,7 +24,7 @@ A simple node package to parse and write Gnip JSON records into an [ArcGIS Featu
 ### Writing to an ArcGIS Feature Service
 You must have the URL to a target Feature Service with editing enabled and a specific set of attributes (see [Creating a target Feature Service](#creating-a-target-feature-service) below).
 
-Once you have that URL, use the esri-gnip module like this:
+Once you have that URL, initialize the esri-gnip writer and write records like this:
 
 ``` JavaScript
 var esriGnip = require('esri-gnip');
@@ -37,6 +46,10 @@ var myGnip = new esriGnip.Writer(featureServiceURL, function(err, metadata) {
   }
 });
 ```
+
+The callback is called once the writer is initialized and ready to accept Gnip records. Within the callback, `this` will refer to the newly created writer object.
+
+There is also an `initialized` property on the writer which can be used to determine if the writer is ready. It is recommended you use the callback pattern where possible.
 
 #### Output
 The `results` callback parameter will look like this:
@@ -149,15 +162,18 @@ NOTE: Go here to get a free [ArcGIS Developer subscription](https://developers.a
 
 ## Resources
 
+* [ArcGIS Feature Service overview](https://developers.arcgis.com/en/features/cloud-storage/)
+* [ArcGIS Feature Service documentation](http://resources.arcgis.com/en/help/arcgis-rest-api/#/Feature_Service/02r3000000z2000000/)
 * [ArcGIS REST Specification](http://resources.arcgis.com/en/help/arcgis-rest-api/)
 * [node.js documentation](http://nodejs.org/api/)
+* [gnip-reader](https://www.npmjs.org/package/gnip-reader)
 * [Terraformer](https://github.com/esri/terraformer)
 * [Geoservices-js](https://github.com/Esri/geoservices-js)
 * [Gnip Documentation](http://support.gnip.com/sources/twitter/data_format.html) (incomplete)
 * [Gnip Test Records](example/example-gnip-data.json)
 
 ## Notes
-* Gnip records with no location information are not added.
+* Gnip records without location information are not added.
 * Gnip records with coordinates of [0,0] can optionally be considered to have no location (see [Excluding records at [0,0]](#excluding-records-at-00)  and [Parsing Gnip JSON records](#parsing-gnip-json-records) above).
 * Advanced users can use the `Gnip.sd` Service Definition file included in this repo to create a suitable target Feature Service. `Gnip.sd` can be used with ArcGIS Online or ArcGIS Server. It will create a Feature Service named `Gnip`, so ensure there is no pre-existing Feature Service of that name before use.
 

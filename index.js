@@ -201,7 +201,7 @@ function parseGnipToArcGIS(gnipRecords, excludeNullIslands) {
 function EsriGnip(options, initializationCallback) {
   // Object properties
   this.options = {};
-  this.featureServiceLoaded = false;
+  this.initialized = false;
 
 
   // Make sure at least a URL parameter was passed in.
@@ -234,7 +234,7 @@ function EsriGnip(options, initializationCallback) {
       }
       console.error('ERROR connecting to Feature Service: ' + err.message);
     } else {
-      this.featureServiceLoaded = true;
+      this.initialized = true;
     }
     if (initializationCallback) {
       initializationCallback.bind(this)(err, metadata);
