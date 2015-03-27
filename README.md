@@ -66,8 +66,8 @@ A `translationError` is structured as follows:
 
 ``` JavaScript
 {
-  translationError: { 
-    message: '<string>', 
+  translationError: {
+    message: '<string>',
     stack: '<string>'
   },
   record: { /* a Gnip record */ }
@@ -157,7 +157,7 @@ A target feature service of the correct schema is required to write Gnip records
 
 You will be taken to the new Feature Service's *item page*. To get the REST Endpoint URL, click the layer name in the `Layers` section (or click the caret next to it to display the popup menu and select `Service URL`). The URL of the newly opened page is the REST Endpoint needed by esri-gnip and will look similar to the URL in Step 5 above.
 
-NOTE: Go here to get a free [ArcGIS Developer subscription](https://developers.arcgis.com/en/) or a trial [ArcGIS Online Organization subscription](http://www.arcgis.com/home/). 
+NOTE: Go here to get a free [ArcGIS Developer subscription](https://developers.arcgis.com/en/) or a trial [ArcGIS Online Organization subscription](http://www.arcgis.com/home/).
 
 
 ## Resources
@@ -186,7 +186,7 @@ Find a bug or want to request a new feature?  Please let us know by submitting a
 Anyone and everyone is welcome to contribute.
 
 ## Licensing
-Copyright 2014 Esri
+Copyright 2015 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
